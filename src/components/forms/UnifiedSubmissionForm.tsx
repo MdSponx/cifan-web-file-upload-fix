@@ -109,8 +109,6 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
   }>({
     isSubmitting: false
   });
-  const [showDraftSuccessDialog, setShowDraftSuccessDialog] = useState(false);
-  const [savedApplicationId, setSavedApplicationId] = useState<string>('');
 
   // Fetch user profile data and populate form
   useEffect(() => {
