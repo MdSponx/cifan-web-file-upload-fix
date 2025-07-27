@@ -354,6 +354,15 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                       onClick={(e) => {
                         e.stopPropagation();
                         window.location.hash = `#application-detail/${application.id}`;
+                      }}
+                    >
+                      {currentContent.viewDetails}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>
