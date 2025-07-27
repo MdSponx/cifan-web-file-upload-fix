@@ -678,73 +678,6 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                       <td className={`px-4 py-3 ${getClass('body')} text-white/90 text-sm`}>
                         <div className="flex items-center space-x-2">
                           <span>{member.age}</span>
-                          {(() => {
-                            if (isNaN(member.age)) return null;
-                            
-                            let isValidAge = true;
-                            
-                            if (!isWorldForm) {
-                              if (window.location.hash.includes('future')) {
-                                if (member.age < 18 || member.age > 25) {
-                                  isValidAge = false;
-                                }
-                              } else {
-                                if (member.age < 12 || member.age > 18) {
-                                  isValidAge = false;
-                                }
-                              }
-                            } else {
-                              if (member.age < 20) {
-                                isValidAge = false;
-                              }
-                            }
-                            
-                            if (!isValidAge) {
-                              const warningMessage = (() => {
-                                if (!isWorldForm) {
-                                  if (window.location.hash.includes('future')) {
-                                    if (member.age < 18) {
-                                      return currentLanguage === 'th' 
-                                        ? 'อายุต้องไม่น้อยกว่า 18 ปี สำหรับหมวดอนาคต' 
-                                        : 'Age must be at least 18 years for Future category';
-                                    } else if (member.age > 25) {
-                                      return currentLanguage === 'th' 
-                                        ? 'อายุต้องไม่เกิน 25 ปี สำหรับหมวดอนาคต' 
-                                        : 'Age must not exceed 25 years for Future category';
-                                    }
-                                  } else {
-                                    if (member.age < 12) {
-                                      return currentLanguage === 'th' 
-                                        ? 'อายุต้องไม่น้อยกว่า 12 ปี สำหรับหมวดเยาวชน' 
-                                        : 'Age must be at least 12 years for Youth category';
-                                    } else if (member.age > 18) {
-                                      return currentLanguage === 'th' 
-                                        ? 'อายุต้องไม่เกิน 18 ปี สำหรับหมวดเยาวชน' 
-                                        : 'Age must not exceed 18 years for Youth category';
-                                    }
-                                  }
-                                } else {
-                                  if (member.age < 20) {
-                                    return currentLanguage === 'th' 
-                                      ? 'อายุต้องไม่น้อยกว่า 20 ปี สำหรับหมวดโลก' 
-                                      : 'Age must be at least 20 years for World category';
-                                  }
-                                }
-                                return '';
-                              })();
-                              
-                              return (
-                                <span 
-                                  className="text-red-400 cursor-help" 
-                                  title={warningMessage}
-                                >
-                                  ⚠️
-                                </span>
-                              );
-                            }
-                            
-                            return null;
-                          })()}
                         </div>
                       </td>
                       {!isWorldForm && (
@@ -826,36 +759,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                   </div>
                   <div>
                     <span className="text-white/60">{currentContent.tableHeaders.age}:</span>
-                    <div className="flex items-center space-x-2 mt-1">
-                      <span className={`${getClass('body')} text-white/90`}>{member.age}</span>
-                      {(() => {
-                        if (isNaN(member.age)) return null;
-                        
-                        let isValidAge = true;
-                        
-                        if (!isWorldForm) {
-                          if (window.location.hash.includes('future')) {
-                            if (member.age < 18 || member.age > 25) {
-                              isValidAge = false;
-                            }
-                          } else {
-                            if (member.age < 12 || member.age > 18) {
-                              isValidAge = false;
-                            }
-                          }
-                        } else {
-                          if (member.age < 20) {
-                            isValidAge = false;
-                          }
-                        }
-                        
-                        if (!isValidAge) {
-                          return <span className="text-red-400">⚠️</span>;
-                        }
-                        
-                        return null;
-                      })()}
-                    </div>
+                    <p className={`${getClass('body')} text-white/90 mt-1`}>{member.age}</p>
                   </div>
                   {!isWorldForm && (
                     <>

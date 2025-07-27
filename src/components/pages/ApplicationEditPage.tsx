@@ -928,6 +928,19 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
                   onError={(error: string) => setError(error)}
                 />
               )}
+              {application.files.proofFile && (
+                <UnifiedFileUpload
+                  mode="replace"
+                  name="proofFile"
+                  label={currentLanguage === 'th' ? 'หลักฐาน' : 'Proof Document'}
+                  accept={application.competitionCategory === 'youth' ? ".pdf,.jpg,.jpeg,.png" : "image/*,.pdf"}
+                  fileType="DOCUMENT"
+                  applicationId={application.id}
+                  currentFileName={application.files.proofFile.fileName}
+                  onFileReplaced={(newFileMetadata: any) => handleFileReplaced('proofFile', newFileMetadata)}
+                  onError={(error: string) => setError(error)}
+                />
+              )}
             </div>
         </FormSection>
 
