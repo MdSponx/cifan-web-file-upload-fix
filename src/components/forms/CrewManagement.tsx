@@ -463,66 +463,63 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                   value={crewFormData.customRole}
                   onChange={handleCrewInputChange}
                   className={`w-full p-3 rounded-lg bg-white/10 border ${crewFormErrors.customRole ? 'border-red-400' : 'border-white/20'} text-white placeholder-white/50 focus:border-[#FCB283] focus:outline-none`}
-                  {...(() => {
-                    const category = getAgeCategory();
-                    if (category === 'WORLD') {
-                      return { min: "20", max: "100" };
-                    } else if (category === 'FUTURE') {
-                      return { min: "18", max: "25" };
-                    } else {
-                      return { min: "12", max: "18" };
-                    }
-                  })()}
+                />
+                <ErrorMessage error={crewFormErrors.customRole} />
               </div>
             )}
             
             <div>
-                  {(() => {
-                    const category = getAgeCategory();
-                    if (category === 'WORLD') {
-                      return currentLanguage === 'th' ? 'อายุไม่น้อยกว่า 20 ปี (ประชาชนทั่วไป)' : 'Age 20+ years (General public)';
-                    } else if (category === 'FUTURE') {
-                      return currentLanguage === 'th' ? 'อายุ 18-25 ปี (นักศึกษาอุดมศึกษา)' : 'Age 18-25 years (University students)';
-                    } else {
-                      return currentLanguage === 'th' ? 'อายุ 12-18 ปี (นักเรียนมัธยมศึกษา)' : 'Age 12-18 years (High school students)';
-                    }
-                  })()}
+              <label className={`block text-white/90 ${getClass('body')} mb-2`}>
+                {currentContent.age} <span className="text-red-400">*</span>
+                {(() => {
+                  const category = getAgeCategory();
+                  if (category === 'WORLD') {
+                    return currentLanguage === 'th' ? ' (อายุไม่น้อยกว่า 20 ปี - ประชาชนทั่วไป)' : ' (Age 20+ years - General public)';
+                  } else if (category === 'FUTURE') {
+                    return currentLanguage === 'th' ? ' (อายุ 18-25 ปี - นักศึกษาอุดมศึกษา)' : ' (Age 18-25 years - University students)';
+                  } else {
+                    return currentLanguage === 'th' ? ' (อายุ 12-18 ปี - นักเรียนมัธยมศึกษา)' : ' (Age 12-18 years - High school students)';
+                  }
+                })()}
+              </label>
               <input
                 type="number"
                 name="age"
                 value={crewFormData.age}
                 onChange={handleCrewInputChange}
-                min={isWorldForm ? "1" : window.location.hash.includes('future') ? "18" : "12"}
+                {...(() => {
                   const category = getAgeCategory();
-                max={isWorldForm ? "100" : window.location.hash.includes('future') ? "25" : "18"}
+                  if (category === 'WORLD') {
+                    return { min: "20", max: "100" };
+                  } else if (category === 'FUTURE') {
+                    return { min: "18", max: "25" };
+                  } else {
+                    return { min: "12", max: "18" };
+                  }
+                })()}
                 className={`w-full p-3 rounded-lg bg-white/10 border ${crewFormErrors.age ? 'border-red-400' : 'border-white/20'} text-white placeholder-white/50 focus:border-[#FCB283] focus:outline-none`}
               />
-                  if (category === 'YOUTH') {
-                    if (age < 12 || age > 18) {
-                      isValidAge = false;
-                      warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องอยู่ระหว่าง 12-18 ปี สำหรับหมวดเยาวชน' 
-                        : 'Age must be between 12-18 years for Youth category';
-                    }
-                  } else if (category === 'FUTURE') {
-                    if (age < 18 || age > 25) {
-                      isValidAge = false;
-                      warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องอยู่ระหว่าง 18-25 ปี สำหรับหมวดอนาคต' 
-                        : 'Age must be between 18-25 years for Future category';
-                    }
-                    // Youth category: 12-18
-                    if (age < 12) {
-                      isValidAge = false;
-                      warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องไม่น้อยกว่า 12 ปี สำหรับหมวดเยาวชน' 
-                        : 'Age must be at least 12 years for Youth category';
-                    } else if (age > 18) {
-                      isValidAge = false;
-                      warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องไม่เกิน 18 ปี สำหรับหมวดเยาวชน' 
-                        : 'Age must not exceed 18 years for Youth category';
-                    }
+              {(() => {
+                const age = parseInt(crewFormData.age);
+                if (!age || isNaN(age)) return null;
+                
+                let isValidAge = true;
+                let warningMessage = '';
+                
+                const category = getAgeCategory();
+                if (category === 'YOUTH') {
+                  if (age < 12 || age > 18) {
+                    isValidAge = false;
+                    warningMessage = currentLanguage === 'th' 
+                      ? 'อายุต้องอยู่ระหว่าง 12-18 ปี สำหรับหมวดเยาวชน' 
+                      : 'Age must be between 12-18 years for Youth category';
+                  }
+                } else if (category === 'FUTURE') {
+                  if (age < 18 || age > 25) {
+                    isValidAge = false;
+                    warningMessage = currentLanguage === 'th' 
+                      ? 'อายุต้องอยู่ระหว่าง 18-25 ปี สำหรับหมวดอนาคต' 
+                      : 'Age must be between 18-25 years for Future category';
                   }
                 } else {
                   // World category: 20+
