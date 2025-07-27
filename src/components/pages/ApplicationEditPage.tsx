@@ -993,7 +993,8 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
             size="large"
             icon="💾"
             onClick={handleSave}
-            className={saving ? 'opacity-50 cursor-not-allowed' : ''}
+            disabled={saving}
+            className={`${getClass('menu')} ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {saving ? currentContent.saving : currentContent.saveButton}
           </AnimatedButton>
