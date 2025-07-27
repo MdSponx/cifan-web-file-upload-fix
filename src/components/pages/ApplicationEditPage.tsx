@@ -14,6 +14,7 @@ import FormSection from '../forms/FormSection';
 import ErrorMessage from '../forms/ErrorMessage';
 import UnifiedFileUpload from '../forms/UnifiedFileUpload';
 import UserZoneHeader from '../layout/UserZoneHeader';
+import DraftSuccessDialog from '../dialogs/DraftSuccessDialog';
 
 interface ApplicationEditPageProps {
   applicationId: string;
@@ -102,6 +103,8 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [isThaiNationality, setIsThaiNationality] = useState(true);
+  const [showDraftSuccessDialog, setShowDraftSuccessDialog] = useState(false);
+  const [savedApplicationId, setSavedApplicationId] = useState<string>('');
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -484,11 +487,9 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
 
       await updateDoc(docRef, updateData);
 
-      // Navigate back to application detail page
-      window.location.hash = `#application-detail/${applicationId}`;
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 100);
+      // Show draft success dialog instead of immediate navigation
+      setSavedApplicationId(application.id);
+      setShowDraftSuccessDialog(true);
 
     } catch (error) {
       console.error('Error saving application:', error);
@@ -503,6 +504,29 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
+  };
+
+  const handleSubmitNow = async () => {
+    try {
+      setShowDraftSuccessDialog(false);
+      // Navigate to application detail page for submission
+      window.location.hash = `#application-detail/${application.id}`;
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    } catch (error) {
+      console.error('Error navigating to submission:', error);
+    }
+  };
+
+  const handleReviewLater = () => {
+    setShowDraftSuccessDialog(false);
+    // Stay on current page for continued editing
+  };
+
+  const handleCloseDraftDialog = () => {
+    setShowDraftSuccessDialog(false);
+    // Stay on current page for continued editing
   };
 
   const getCategoryLogo = (category: string) => {
@@ -606,6 +630,16 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
           </div>
           <p className={`${getClass('body')} text-red-300`}>
             {error}
+
+      {/* Draft Success Dialog */}
+      <DraftSuccessDialog
+        isOpen={showDraftSuccessDialog}
+        onClose={handleCloseDraftDialog}
+        onSubmitNow={handleSubmitNow}
+        onReviewLater={handleReviewLater}
+        applicationId={savedApplicationId}
+        isDraft={true}
+      />
           </p>
         </div>
       )}
