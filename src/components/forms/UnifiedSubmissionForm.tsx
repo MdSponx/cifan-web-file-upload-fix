@@ -13,6 +13,7 @@ import UnifiedFileUpload from './UnifiedFileUpload';
 import CrewManagement from './CrewManagement';
 import AgreementCheckboxes from './AgreementCheckboxes';
 import NationalitySelector from '../ui/NationalitySelector';
+import DraftSuccessDialog from '../dialogs/DraftSuccessDialog';
 import AnimatedButton from '../ui/AnimatedButton';
 import SubmissionProgressComponent from '../ui/SubmissionProgress';
 import ErrorMessage from './ErrorMessage';
@@ -104,6 +105,8 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
   }>({
     isSubmitting: false
   });
+  const [showDraftSuccessDialog, setShowDraftSuccessDialog] = useState(false);
+  const [savedApplicationId, setSavedApplicationId] = useState<string>('');
 
   // Fetch user profile data and populate form
   useEffect(() => {
@@ -385,10 +388,9 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       setSubmissionState(prev => ({ ...prev, result }));
 
       if (result.success) {
-        // Redirect to applications list after successful draft save
-        setTimeout(() => {
-          window.location.hash = '#my-applications';
-        }, 2000);
+        // Show draft success dialog instead of immediate redirect
+        setSavedApplicationId(result.submissionId || '');
+        setShowDraftSuccessDialog(true);
       }
 
     } catch (error) {
@@ -411,6 +413,24 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       world: "https://firebasestorage.googleapis.com/v0/b/cifan-c41c6.firebasestorage.app/o/site_files%2Ffest_logos%2FGroup%204.png?alt=media&token=84ad0256-2322-4999-8e9f-d2f30c7afa67"
     };
     return logos[category];
+  };
+
+  const handleSubmitNow = () => {
+    setShowDraftSuccessDialog(false);
+    if (savedApplicationId) {
+      window.location.hash = `#application-detail/${savedApplicationId}`;
+      setTimeout(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
+  const handleReviewLater = () => {
+    setShowDraftSuccessDialog(false);
+    window.location.hash = '#my-applications';
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   // Show submission progress
@@ -866,6 +886,16 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
           </div>
         </form>
       </div>
+
+      {/* Draft Success Dialog */}
+      <DraftSuccessDialog
+        isOpen={showDraftSuccessDialog}
+        onClose={() => setShowDraftSuccessDialog(false)}
+        onSubmitNow={handleSubmitNow}
+        onReviewLater={handleReviewLater}
+        applicationId={savedApplicationId}
+        isDraft={true}
+      />
     </div>
   );
 };
