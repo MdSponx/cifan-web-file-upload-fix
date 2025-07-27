@@ -198,6 +198,12 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
   };
 
   const addCrewMember = () => {
+    // Prevent form submission
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     const errors = validateCrewForm();
     if (Object.keys(errors).length > 0) {
       setCrewFormErrors(errors);
@@ -332,6 +338,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
       {/* Add Crew Member Button */}
       <div className="mb-6">
         <AnimatedButton
+          type="button"
           variant="secondary"
           size="medium"
           icon="➕"
@@ -586,6 +593,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
           </div>
           <div className="flex gap-4 mt-4">
             <AnimatedButton
+              type="button"
               variant="primary"
               size="small"
               icon="✅"
@@ -595,6 +603,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
               {editingCrewId ? currentContent.updateMember : currentContent.addMember}
             </AnimatedButton>
             <AnimatedButton
+              type="button"
               variant="outline"
               size="small"
               icon="❌"
@@ -893,6 +902,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
             </h4>
             <div className="flex gap-4">
               <AnimatedButton
+                type="button"
                 variant="primary"
                 size="small"
                 onClick={() => deleteCrewMember(showDeleteConfirm)}
@@ -901,6 +911,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                 {currentContent.delete}
               </AnimatedButton>
               <AnimatedButton
+                type="button"
                 variant="outline"
                 size="small"
                 onClick={() => setShowDeleteConfirm(null)}

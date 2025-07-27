@@ -1,15 +1,17 @@
 import React from 'react';
 
 interface AnimatedButtonProps {
+  type?: 'button' | 'submit' | 'reset';
   variant: 'primary' | 'secondary' | 'outline';
   size: 'small' | 'medium' | 'large';
   icon?: string;
   children: React.ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const AnimatedButton: React.FC<AnimatedButtonProps> = ({ 
+  type = 'button',
   variant, 
   size, 
   icon, 
@@ -31,10 +33,22 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
     large: "px-6 py-3 text-base sm:px-8 sm:py-4 sm:text-lg rounded-xl sm:rounded-2xl"
   };
 
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent form submission for type="button"
+    if (type === 'button') {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    if (onClick) {
+      onClick(e);
+    }
+  };
   return (
     <button
+      type={type}
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <span className="relative z-10 flex items-center justify-center space-x-2">
         {icon && <span>{icon}</span>}
