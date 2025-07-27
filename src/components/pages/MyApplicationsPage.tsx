@@ -358,11 +358,10 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }, 100);
                       }}
-                      className="px-3 py-1 bg-blue-500/80 hover:bg-blue-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
+                      className="w-8 h-8 bg-blue-500/80 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-colors"
                       title={currentContent.viewDetails}
                     >
-                      <span className="mr-1">👁️</span>
-                      <span>{currentLanguage === 'th' ? 'ดู' : 'View'}</span>
+                      👁️
                     </button>
                     
                     {application.status === 'draft' && (
@@ -374,11 +373,10 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                             window.scrollTo({ top: 0, behavior: 'smooth' });
                           }, 100);
                         }}
-                        className="px-3 py-1 bg-orange-500/80 hover:bg-orange-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
+                        className="w-8 h-8 bg-orange-500/80 hover:bg-orange-600 rounded-full flex items-center justify-center text-white transition-colors"
                         title={currentContent.editApplication}
                       >
-                        <span className="mr-1">✏️</span>
-                        <span>{currentLanguage === 'th' ? 'แก้ไข' : 'Edit'}</span>
+                        ✏️
                       </button>
                     )}
                   </div>
