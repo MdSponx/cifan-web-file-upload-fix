@@ -16,6 +16,7 @@ interface CrewManagementProps {
   error?: string;
   isWorldForm?: boolean;
   className?: string;
+  competitionCategory?: 'youth' | 'future' | 'world';
 }
 
 const CrewManagement: React.FC<CrewManagementProps> = ({
@@ -26,7 +27,8 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
   submitterUniversityName,
   error,
   isWorldForm = false,
-  className = ''
+  className = '',
+  competitionCategory
 }) => {
   const { i18n } = useTranslation();
   const { getClass } = useTypography();
@@ -140,6 +142,22 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
 
   const currentContent = content[currentLanguage];
 
+  // Smart age category detection with priority system
+  const getAgeCategory = (): 'YOUTH' | 'FUTURE' | 'WORLD' => {
+    // Priority 1: Use competitionCategory prop (for edit mode)
+    if (competitionCategory) {
+      return competitionCategory.toUpperCase() as 'YOUTH' | 'FUTURE' | 'WORLD';
+    }
+    
+    // Priority 2: Check isWorldForm prop
+    if (isWorldForm) {
+      return 'WORLD';
+    }
+    
+    // Priority 3: Fallback to URL hash (for new submissions)
+    return window.location.hash.includes('future') ? 'FUTURE' : 'YOUTH';
+  };
+
   const validateCrewForm = (): FormErrors => {
     const errors: FormErrors = {};
     
@@ -159,8 +177,8 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
         errors.age = validationMessages.required;
       } else {
         const age = parseInt(crewFormData.age);
-        // Age validation based on form type
-        const ageCategory = window.location.hash.includes('future') ? 'FUTURE' : 'YOUTH';
+        // Age validation based on competition category
+        const ageCategory = getAgeCategory();
         if (!validateAge(age, ageCategory)) {
           errors.age = validationMessages.invalidAge(ageCategory);
         }
@@ -445,53 +463,54 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                   value={crewFormData.customRole}
                   onChange={handleCrewInputChange}
                   className={`w-full p-3 rounded-lg bg-white/10 border ${crewFormErrors.customRole ? 'border-red-400' : 'border-white/20'} text-white placeholder-white/50 focus:border-[#FCB283] focus:outline-none`}
-                />
-                <ErrorMessage error={crewFormErrors.customRole} />
+                  {...(() => {
+                    const category = getAgeCategory();
+                    if (category === 'WORLD') {
+                      return { min: "20", max: "100" };
+                    } else if (category === 'FUTURE') {
+                      return { min: "18", max: "25" };
+                    } else {
+                      return { min: "12", max: "18" };
+                    }
+                  })()}
               </div>
             )}
             
             <div>
-              <label className={`block text-white/90 ${getClass('body')} mb-2`}>
-                {currentContent.age} <span className="text-red-400">*</span>
-              </label>
+                  {(() => {
+                    const category = getAgeCategory();
+                    if (category === 'WORLD') {
+                      return currentLanguage === 'th' ? 'อายุไม่น้อยกว่า 20 ปี (ประชาชนทั่วไป)' : 'Age 20+ years (General public)';
+                    } else if (category === 'FUTURE') {
+                      return currentLanguage === 'th' ? 'อายุ 18-25 ปี (นักศึกษาอุดมศึกษา)' : 'Age 18-25 years (University students)';
+                    } else {
+                      return currentLanguage === 'th' ? 'อายุ 12-18 ปี (นักเรียนมัธยมศึกษา)' : 'Age 12-18 years (High school students)';
+                    }
+                  })()}
               <input
                 type="number"
                 name="age"
                 value={crewFormData.age}
                 onChange={handleCrewInputChange}
                 min={isWorldForm ? "1" : window.location.hash.includes('future') ? "18" : "12"}
+                  const category = getAgeCategory();
                 max={isWorldForm ? "100" : window.location.hash.includes('future') ? "25" : "18"}
                 className={`w-full p-3 rounded-lg bg-white/10 border ${crewFormErrors.age ? 'border-red-400' : 'border-white/20'} text-white placeholder-white/50 focus:border-[#FCB283] focus:outline-none`}
               />
-              {/* Age restriction warning for crew members */}
-              <p className={`text-xs ${getClass('body')} text-white/60 mt-1`}>
-                {!isWorldForm && window.location.hash.includes('future') && (currentLanguage === 'th' ? 'อายุไม่เกิน 25 ปี (นักศึกษาอุดมศึกษา)' : 'Age up to 25 years (University students)')}
-                {!isWorldForm && !window.location.hash.includes('future') && (currentLanguage === 'th' ? 'อายุ 12-18 ปี (นักเรียนมัธยมศึกษา)' : 'Age 12-18 years (High school students)')}
-                {isWorldForm && (currentLanguage === 'th' ? 'ไม่จำกัดอายุ (ประชาชนทั่วไป)' : 'No age limit (General public)')}
-              </p>
-              {/* Age validation warning */}
-              {crewFormData.age && (() => {
-                const age = parseInt(crewFormData.age);
-                if (isNaN(age)) return null;
-                
-                let isValidAge = true;
-                let warningMessage = '';
-                
-                if (!isWorldForm) {
-                  if (window.location.hash.includes('future') || window.location.hash.includes('submit-future')) {
-                    // Future category: 18-25
-                    if (age < 18) {
+                  if (category === 'YOUTH') {
+                    if (age < 12 || age > 18) {
                       isValidAge = false;
                       warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องไม่น้อยกว่า 18 ปี สำหรับหมวดอนาคต' 
-                        : 'Age must be at least 18 years for Future category';
-                    } else if (age > 25) {
-                      isValidAge = false;
-                      warningMessage = currentLanguage === 'th' 
-                        ? 'อายุต้องไม่เกิน 25 ปี สำหรับหมวดอนาคต' 
-                        : 'Age must not exceed 25 years for Future category';
+                        ? 'อายุต้องอยู่ระหว่าง 12-18 ปี สำหรับหมวดเยาวชน' 
+                        : 'Age must be between 12-18 years for Youth category';
                     }
-                  } else {
+                  } else if (category === 'FUTURE') {
+                    if (age < 18 || age > 25) {
+                      isValidAge = false;
+                      warningMessage = currentLanguage === 'th' 
+                        ? 'อายุต้องอยู่ระหว่าง 18-25 ปี สำหรับหมวดอนาคต' 
+                        : 'Age must be between 18-25 years for Future category';
+                    }
                     // Youth category: 12-18
                     if (age < 12) {
                       isValidAge = false;
