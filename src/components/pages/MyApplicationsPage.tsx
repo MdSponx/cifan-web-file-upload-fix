@@ -358,11 +358,11 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }, 100);
                       }}
-                          className="px-3 py-1 bg-blue-500/80 hover:bg-blue-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
+                      className="px-3 py-1 bg-blue-500/80 hover:bg-blue-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
                       title={currentContent.viewDetails}
                     >
-                          <span className="mr-1">👁️</span>
-                          <span>{currentLanguage === 'th' ? 'ดู' : 'View'}</span>
+                      <span className="mr-1">👁️</span>
+                      <span>{currentLanguage === 'th' ? 'ดู' : 'View'}</span>
                     </button>
                     
                     {application.status === 'draft' && (
@@ -371,26 +371,15 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                           e.stopPropagation();
                           window.location.hash = `#application-edit/${application.id}`;
                           setTimeout(() => {
-                    {/* Action Buttons and Status Badge - Always Visible */}
-                    <div className="flex items-center justify-between mt-3">
-                      {/* Action Buttons - Left Side */}
-                            className="px-3 py-1 bg-orange-500/80 hover:bg-orange-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }, 100);
                         }}
-                        className="w-8 h-8 bg-orange-500/80 hover:bg-orange-600 rounded-full flex items-center justify-center text-white transition-colors"
-                            <span className="mr-1">✏️</span>
-                            <span>{currentLanguage === 'th' ? 'แก้ไข' : 'Edit'}</span>
+                        className="px-3 py-1 bg-orange-500/80 hover:bg-orange-600 rounded-lg flex items-center justify-center text-white transition-colors text-xs"
+                        title={currentContent.editApplication}
                       >
-                        ✏️
+                        <span className="mr-1">✏️</span>
+                        <span>{currentLanguage === 'th' ? 'แก้ไข' : 'Edit'}</span>
                       </button>
-                      
-                      {/* Status Badge - Right Side */}
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium border ${
-                        application.status === 'submitted' 
-                          ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-                          : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
-                      }`}>
-                        {application.status === 'submitted' ? currentContent.submitted : currentContent.draft}
-                      </span>
                     )}
                   </div>
                 </div>
