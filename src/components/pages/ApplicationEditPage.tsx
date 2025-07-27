@@ -487,7 +487,7 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
 
       await updateDoc(docRef, updateData);
 
-      // Show draft success dialog instead of immediate navigation
+      // Show draft success dialog instead of alert
       setSavedApplicationId(application.id);
       setShowDraftSuccessDialog(true);
 
@@ -507,21 +507,21 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
   };
 
   const handleSubmitNow = async () => {
-    try {
-      setShowDraftSuccessDialog(false);
-      // Navigate to application detail page for submission
-      window.location.hash = `#application-detail/${application.id}`;
-      setTimeout(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 100);
-    } catch (error) {
-      console.error('Error navigating to submission:', error);
-    }
+    setShowDraftSuccessDialog(false);
+    // Navigate to application detail page for submission
+    window.location.hash = `#application-detail/${application?.id}`;
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleReviewLater = () => {
     setShowDraftSuccessDialog(false);
-    // Stay on current page for continued editing
+    // Navigate to applications list
+    window.location.hash = '#my-applications';
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
   };
 
   const handleCloseDraftDialog = () => {
@@ -630,16 +630,6 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
           </div>
           <p className={`${getClass('body')} text-red-300`}>
             {error}
-
-      {/* Draft Success Dialog */}
-      <DraftSuccessDialog
-        isOpen={showDraftSuccessDialog}
-        onClose={handleCloseDraftDialog}
-        onSubmitNow={handleSubmitNow}
-        onReviewLater={handleReviewLater}
-        applicationId={savedApplicationId}
-        isDraft={true}
-      />
           </p>
         </div>
       )}
@@ -1000,6 +990,16 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
           </AnimatedButton>
         </div>
       </div>
+
+      {/* Draft Success Dialog */}
+      <DraftSuccessDialog
+        isOpen={showDraftSuccessDialog}
+        onClose={handleCloseDraftDialog}
+        onSubmitNow={handleSubmitNow}
+        onReviewLater={handleReviewLater}
+        applicationId={savedApplicationId}
+        isDraft={true}
+      />
     </div>
   );
 };

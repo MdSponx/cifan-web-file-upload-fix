@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTypography } from '../../utils/typography';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '../../firebase';
 import VideoSection from './VideoSection';
 import DetailsSection from './DetailsSection';
 import AnimatedButton from '../ui/AnimatedButton';
 import SubmissionConfirm from './SubmissionConfirm';
+import DraftSuccessDialog from '../dialogs/DraftSuccessDialog';
 import { ApplicationService, FilmApplication } from '../../services/applicationService';
 
 interface ApplicationData {
@@ -71,6 +74,10 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ application }) =>
   const [showSubmissionConfirm, setShowSubmissionConfirm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Draft Success Dialog state
+  const [showDraftSuccessDialog, setShowDraftSuccessDialog] = useState(false);
+  const [savedApplicationId, setSavedApplicationId] = useState<string>('');
+
   // Determine if application can be edited (only drafts can be edited)
   const canEdit = application.status === 'draft';
 
@@ -91,9 +98,16 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ application }) =>
     
     setIsProcessing(true);
     try {
-      // TODO: Implement save draft functionality
-      console.log('Saving draft...');
-      alert(currentLanguage === 'th' ? 'บันทึกร่างเรียบร้อย' : 'Draft saved successfully');
+      // Update the application's lastModified timestamp
+      const docRef = doc(db, 'submissions', application.id);
+      await updateDoc(docRef, {
+        lastModified: serverTimestamp()
+      });
+
+      // Show draft success dialog instead of alert
+      setSavedApplicationId(application.id);
+      setShowDraftSuccessDialog(true);
+
     } catch (error) {
       console.error('Error saving draft:', error);
       alert(error instanceof Error ? error.message : 'Failed to save draft');
@@ -135,6 +149,27 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ application }) =>
   const handleSubmissionComplete = () => {
     // Refresh the page or redirect
     window.location.reload();
+  };
+
+  // Draft Success Dialog handlers
+  const handleSubmitNow = async () => {
+    setShowDraftSuccessDialog(false);
+    // Open submission confirmation modal
+    setShowSubmissionConfirm(true);
+  };
+
+  const handleReviewLater = () => {
+    setShowDraftSuccessDialog(false);
+    // Navigate to applications list
+    window.location.hash = '#my-applications';
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
+
+  const handleCloseDraftDialog = () => {
+    setShowDraftSuccessDialog(false);
+    // Stay on current page
   };
 
   const getCategoryLogo = (category: string) => {
@@ -527,6 +562,16 @@ const ApplicationLayout: React.FC<ApplicationLayoutProps> = ({ application }) =>
         isOpen={showSubmissionConfirm}
         onClose={() => setShowSubmissionConfirm(false)}
         onSubmitted={handleSubmissionComplete}
+      />
+
+      {/* Draft Success Dialog */}
+      <DraftSuccessDialog
+        isOpen={showDraftSuccessDialog}
+        onClose={handleCloseDraftDialog}
+        onSubmitNow={handleSubmitNow}
+        onReviewLater={handleReviewLater}
+        applicationId={savedApplicationId}
+        isDraft={true}
       />
     </div>
   );
