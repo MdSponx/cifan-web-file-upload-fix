@@ -29,6 +29,10 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
   const currentLanguage = i18n.language as 'en' | 'th';
   const validationMessages = getValidationMessages(currentLanguage);
 
+  // Dialog state
+  const [showDraftSuccessDialog, setShowDraftSuccessDialog] = useState(false);
+  const [savedApplicationId, setSavedApplicationId] = useState<string>('');
+
   // Form state
   const [formData, setFormData] = useState<YouthFormData | FutureFormData | WorldFormData>(() => {
     const baseData = {
@@ -388,8 +392,10 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       setSubmissionState(prev => ({ ...prev, result }));
 
       if (result.success) {
-        // Show the success screen first, then the dialog will appear after 2 seconds
-        // The dialog timing is handled in the success screen render
+        // Clear submission state and show dialog immediately
+        setSubmissionState({ isSubmitting: false });
+        setSavedApplicationId(result.submissionId || '');
+        setShowDraftSuccessDialog(true);
       }
 
     } catch (error) {
@@ -415,8 +421,6 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
   };
 
   const handleSubmitNow = () => {
-    setShowDraftSuccessDialog(false);
-    setSubmissionState({ isSubmitting: false }); // Reset submission state
     if (savedApplicationId) {
       window.location.hash = `#application-detail/${savedApplicationId}`;
       setTimeout(() => {
@@ -426,12 +430,18 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
   };
 
   const handleReviewLater = () => {
-    setShowDraftSuccessDialog(false);
-    setSubmissionState({ isSubmitting: false }); // Reset submission state
     window.location.hash = '#my-applications';
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 100);
+  };
+
+  const handleCloseDraftDialog = () => {
+    setShowDraftSuccessDialog(false);
+    // Default to applications list if user closes dialog
+    setTimeout(() => {
+      window.location.hash = '#my-applications';
+    }, 500);
   };
 
   // Show submission progress
@@ -441,66 +451,32 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
         <div className="max-w-4xl mx-auto">
           <SubmissionProgressComponent 
             progress={submissionState.progress}
-            onNationalityTypeChange={() => {}} // No-op function for compatibility
           />
         </div>
       </div>
     );
   }
 
-  // Show submission result
-  if (submissionState.result) {
+  // Show error screen only for failed submissions
+  if (submissionState.result && !submissionState.result.success) {
     return (
       <div className="min-h-screen bg-[#110D16] pt-24 pb-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="glass-container rounded-2xl p-8 text-center max-w-2xl mx-auto">
-            {submissionState.result.success ? (
-              <>
-                <div className="text-6xl mb-6">✅</div>
-                <h2 className={`text-2xl ${getClass('header')} mb-4 text-white`}>
-                  {currentLanguage === 'th' ? 'บันทึกร่างสำเร็จ!' : 'Draft Saved Successfully!'}
-                </h2>
-                <p className={`text-white/80 ${getClass('body')} mb-6`}>
-                  {currentLanguage === 'th' 
-                    ? 'ร่างใบสมัครของคุณได้รับการบันทึกแล้ว คุณสามารถแก้ไขและส่งใบสมัครได้ในภายหลัง'
-                    : 'Your application draft has been saved. You can edit and submit it later.'
-                  }
-                </p>
-                {/* Auto-show draft dialog after 2 seconds */}
-                {React.useEffect(() => {
-                  const timer = setTimeout(() => {
-                    setSavedApplicationId(submissionState.result?.submissionId || '');
-                    setShowDraftSuccessDialog(true);
-                  }, 2000);
-                  
-                  return () => clearTimeout(timer);
-                }, [])}
-                
-                <div className="space-y-4">
-                  <div className="loading-spinner mx-auto"></div>
-                  <p className={`text-sm text-white/60 ${getClass('menu')}`}>
-                    {currentLanguage === 'th' ? 'กำลังเตรียมตัวเลือกถัดไป...' : 'Preparing next options...'}
-                  </p>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-6xl mb-6">❌</div>
-                <h2 className={`text-2xl ${getClass('header')} mb-4 text-white`}>
-                  {currentLanguage === 'th' ? 'เกิดข้อผิดพลาด' : 'Error Occurred'}
-                </h2>
-                <p className={`text-white/80 ${getClass('body')} mb-6`}>
-                  {submissionState.result.error}
-                </p>
-                <AnimatedButton
-                  variant="primary"
-                  size="medium"
-                  onClick={() => setSubmissionState({ isSubmitting: false })}
-                >
-                  {currentLanguage === 'th' ? 'ลองใหม่' : 'Try Again'}
-                </AnimatedButton>
-              </>
-            )}
+            <div className="text-6xl mb-6">❌</div>
+            <h2 className={`text-2xl ${getClass('header')} mb-4 text-white`}>
+              {currentLanguage === 'th' ? 'เกิดข้อผิดพลาด' : 'Error Occurred'}
+            </h2>
+            <p className={`text-white/80 ${getClass('body')} mb-6`}>
+              {submissionState.result.error}
+            </p>
+            <AnimatedButton
+              variant="primary"
+              size="medium"
+              onClick={() => setSubmissionState({ isSubmitting: false })}
+            >
+              {currentLanguage === 'th' ? 'ลองอีกครั้ง' : 'Try Again'}
+            </AnimatedButton>
           </div>
         </div>
       </div>
@@ -903,14 +879,10 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       {/* Draft Success Dialog */}
       <DraftSuccessDialog
         isOpen={showDraftSuccessDialog}
-        onClose={() => {
-          setShowDraftSuccessDialog(false);
-          setSubmissionState({ isSubmitting: false });
-        }}
+        onClose={handleCloseDraftDialog}
         onSubmitNow={handleSubmitNow}
         onReviewLater={handleReviewLater}
         applicationId={savedApplicationId}
-        isDraft={true}
       />
     </div>
   );
