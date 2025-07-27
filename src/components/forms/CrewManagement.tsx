@@ -478,7 +478,7 @@ const CrewManagement: React.FC<CrewManagementProps> = ({
                 let warningMessage = '';
                 
                 if (!isWorldForm) {
-                  if (window.location.hash.includes('future')) {
+                  if (window.location.hash.includes('future') || window.location.hash.includes('submit-future')) {
                     // Future category: 18-25
                     if (age < 18) {
                       isValidAge = false;

@@ -886,6 +886,7 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
           error={formErrors.crewMembers}
           isWorldForm={isWorldCategory}
           className="w-full"
+          className="w-full"
         />
 
         {/* Section 4: File Management */}
@@ -915,32 +916,17 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
                 onError={(error: string) => setError(error)}
               />
               
-              {application.files.proofFile && (
-                <UnifiedFileUpload
-                  mode="replace"
-                  name="proofFile"
-                  label={currentLanguage === 'th' ? 'หลักฐาน' : 'Proof Document'}
-                  accept={application.competitionCategory === 'youth' ? ".pdf,.jpg,.jpeg,.png" : "image/*,.pdf"}
-                  fileType="DOCUMENT"
-                  applicationId={application.id}
-                  currentFileName={application.files.proofFile.fileName}
-                  onFileReplaced={(newFileMetadata: any) => handleFileReplaced('proofFile', newFileMetadata)}
-                  onError={(error: string) => setError(error)}
-                />
-              )}
-              {application.files.proofFile && (
-                <UnifiedFileUpload
-                  mode="replace"
-                  name="proofFile"
-                  label={currentLanguage === 'th' ? 'หลักฐาน' : 'Proof Document'}
-                  accept={application.competitionCategory === 'youth' ? ".pdf,.jpg,.jpeg,.png" : "image/*,.pdf"}
-                  fileType="DOCUMENT"
-                  applicationId={application.id}
-                  currentFileName={application.files.proofFile.fileName}
-                  onFileReplaced={(newFileMetadata: any) => handleFileReplaced('proofFile', newFileMetadata)}
-                  onError={(error: string) => setError(error)}
-                />
-              )}
+            <UnifiedFileUpload
+              mode="replace"
+              name="proofFile"
+              label={currentLanguage === 'th' ? 'หลักฐาน' : 'Proof Document'}
+              accept={application.competitionCategory === 'youth' ? ".pdf,.jpg,.jpeg,.png" : "image/*,.pdf"}
+              fileType="DOCUMENT"
+              applicationId={application.id}
+              currentFileName={application.files.proofFile?.fileName || 'No proof file'}
+              onFileReplaced={(newFileMetadata: any) => handleFileReplaced('proofFile', newFileMetadata)}
+              onError={(error: string) => setError(error)}
+            />
             </div>
         </FormSection>
 
