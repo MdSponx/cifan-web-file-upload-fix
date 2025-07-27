@@ -354,36 +354,6 @@ const MyApplicationsPage: React.FC<MyApplicationsPageProps> = ({ onSidebarToggle
                       onClick={(e) => {
                         e.stopPropagation();
                         window.location.hash = `#application-detail/${application.id}`;
-                        setTimeout(() => {
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }, 100);
-                      }}
-                      className="w-8 h-8 bg-blue-500/80 hover:bg-blue-600 rounded-full flex items-center justify-center text-white transition-colors"
-                      title={currentContent.viewDetails}
-                    >
-                      👁️
-                    </button>
-                    
-                    {application.status === 'draft' && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.hash = `#application-edit/${application.id}`;
-                          setTimeout(() => {
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }, 100);
-                        }}
-                        className="w-8 h-8 bg-orange-500/80 hover:bg-orange-600 rounded-full flex items-center justify-center text-white transition-colors"
-                        title={currentContent.editApplication}
-                      >
-                        ✏️
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         ))}
       </div>
     </div>
