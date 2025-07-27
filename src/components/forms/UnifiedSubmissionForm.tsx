@@ -388,9 +388,8 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       setSubmissionState(prev => ({ ...prev, result }));
 
       if (result.success) {
-        // Show draft success dialog instead of immediate redirect
-        setSavedApplicationId(result.submissionId || '');
-        setShowDraftSuccessDialog(true);
+        // Show the success screen first, then the dialog will appear after 2 seconds
+        // The dialog timing is handled in the success screen render
       }
 
     } catch (error) {
@@ -417,6 +416,7 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
 
   const handleSubmitNow = () => {
     setShowDraftSuccessDialog(false);
+    setSubmissionState({ isSubmitting: false }); // Reset submission state
     if (savedApplicationId) {
       window.location.hash = `#application-detail/${savedApplicationId}`;
       setTimeout(() => {
@@ -427,6 +427,7 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
 
   const handleReviewLater = () => {
     setShowDraftSuccessDialog(false);
+    setSubmissionState({ isSubmitting: false }); // Reset submission state
     window.location.hash = '#my-applications';
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -465,10 +466,22 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
                     : 'Your application draft has been saved. You can edit and submit it later.'
                   }
                 </p>
-                <div className="loading-spinner mx-auto mb-4"></div>
-                <p className={`text-sm text-white/60 ${getClass('menu')}`}>
-                  {currentLanguage === 'th' ? 'กำลังเปลี่ยนหน้า...' : 'Redirecting...'}
-                </p>
+                {/* Auto-show draft dialog after 2 seconds */}
+                {React.useEffect(() => {
+                  const timer = setTimeout(() => {
+                    setSavedApplicationId(submissionState.result?.submissionId || '');
+                    setShowDraftSuccessDialog(true);
+                  }, 2000);
+                  
+                  return () => clearTimeout(timer);
+                }, [])}
+                
+                <div className="space-y-4">
+                  <div className="loading-spinner mx-auto"></div>
+                  <p className={`text-sm text-white/60 ${getClass('menu')}`}>
+                    {currentLanguage === 'th' ? 'กำลังเตรียมตัวเลือกถัดไป...' : 'Preparing next options...'}
+                  </p>
+                </div>
               </>
             ) : (
               <>
@@ -890,7 +903,10 @@ const UnifiedSubmissionForm: React.FC<UnifiedSubmissionFormProps> = ({ category 
       {/* Draft Success Dialog */}
       <DraftSuccessDialog
         isOpen={showDraftSuccessDialog}
-        onClose={() => setShowDraftSuccessDialog(false)}
+        onClose={() => {
+          setShowDraftSuccessDialog(false);
+          setSubmissionState({ isSubmitting: false });
+        }}
         onSubmitNow={handleSubmitNow}
         onReviewLater={handleReviewLater}
         applicationId={savedApplicationId}
