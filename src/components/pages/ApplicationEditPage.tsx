@@ -204,12 +204,12 @@ const ApplicationEditPage: React.FC<ApplicationEditPageProps> = ({
                 fileSize: data.files?.posterFile?.fileSize || 0,
                 storagePath: data.files?.posterFile?.storagePath || ''
               },
-              proofFile: data.files?.proofFile ? {
+              proofFile: {
                 downloadURL: data.files?.proofFile?.downloadURL || '',
                 fileName: data.files?.proofFile?.fileName || '',
                 fileSize: data.files?.proofFile?.fileSize || 0,
                 storagePath: data.files?.proofFile?.storagePath || ''
-              } : undefined
+              }
             }
           };
 
